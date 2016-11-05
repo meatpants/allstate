@@ -1,0 +1,42 @@
+---
+title: "All State"
+output: html_notebook
+---
+
+```{r}
+
+library(caret)
+library(plyr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(gbm)
+library(Metrics)
+
+
+claims <- read.csv("./train.csv")
+submit.set <- read.csv("./test.csv")
+
+claims.train.numeric <- sapply(claims, function(x) as.numeric(x))
+
+mae.summary <- function(data, lev = NULL, model = NULL) 
+{
+  out <- mae(data$obs, data$pred)  
+  names(out) <- "MAE"
+  out
+}
+
+fit.control <- trainControl(method = "repeatedcv"
+                          , summaryFunction = mae.summary 
+                          , number = 10
+                          , repeats = 10)
+
+claims.fit <- train(loss ~ .
+                    , data = claims.train.numeric
+                    , method = "gbm"
+                    , metric = "MAE"
+                    , trControl = fit.control
+                    , verbose = FALSE)
+
+
+```
