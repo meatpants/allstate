@@ -12,10 +12,16 @@ library(tidyr)
 library(ggplot2)
 library(gbm)
 library(Metrics)
+library(doMC)
 
+registerDoMC(cores = 4)
 
 claims <- read.csv("./train.csv")
 submit.set <- read.csv("./test.csv")
+
+nrow(claims)
+
+# Get a sample for build
 
 claims.train.numeric <- sapply(claims, function(x) as.numeric(x))
 

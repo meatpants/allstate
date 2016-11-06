@@ -3,6 +3,8 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(gbm)
+library(doMC)
+
 
 claims <- read.csv("/home/sam/Dropbox/Sam Dropbox/Analytics/Kaggle/AllState/train.csv")
 submit.set <- read.csv("/home/sam/Dropbox/Sam Dropbox/Analytics/Kaggle/AllState/test.csv")
@@ -20,11 +22,17 @@ trainIndex <- createDataPartition(claims$loss, p = .8,
 claims.train <- claims[trainIndex,]
 claims.test <- claims[-trainIndex,]
 
-fitControl <- trainControl(## 10-fold CV
-  method = "repeatedcv",
-  number = 10,
-  ## repeated ten times
-  repeats = 10)
+
+mae.summary <- function(data, lev = NULL, model = NULL) 
+{
+  out <- mae(data$obs, data$pred)  
+  names(out) <- "MAE"
+  out
+}
+
+mae.control <- trainControl(method = "repeatedcv"
+                            , number = 10
+                            , repeats = 10)
 
 
 claims.train.numeric <- sapply(claims.train , function(x) as.numeric(x))
